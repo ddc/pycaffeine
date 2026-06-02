@@ -20,8 +20,8 @@
     <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg?style=plastic&logo=creativecommons&logoColor=white" alt="License: MIT"/></a>
     <br>
     <a href="https://github.com/ddc/pycaffeine/issues"><img src="https://img.shields.io/github/issues/ddc/pycaffeine?style=plastic&logo=github&logoColor=white" alt="issues"/></a>
-    <a href="https://sonarcloud.io/component_measures?id=ddc_caffeine&metric=coverage"><img src="https://img.shields.io/sonar/coverage/ddc_caffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="SonarCloud Coverage"/></a>
-    <a href="https://sonarcloud.io/dashboard?id=ddc_caffeine"><img src="https://img.shields.io/sonar/quality_gate/ddc_caffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="Quality Gate Status"/></a>
+    <a href="https://sonarcloud.io/component_measures?id=ddc_pycaffeine&metric=coverage"><img src="https://img.shields.io/sonar/coverage/ddc_pycaffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="SonarCloud Coverage"/></a>
+    <a href="https://sonarcloud.io/dashboard?id=ddc_pycaffeine"><img src="https://img.shields.io/sonar/quality_gate/ddc_pycaffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="Quality Gate Status"/></a>
     <a href="https://github.com/ddc/pycaffeine/actions/workflows/workflow.yml"><img src="https://img.shields.io/github/actions/workflow/status/ddc/pycaffeine/workflow.yml?style=plastic&logo=github&logoColor=white&label=CI%2FCD%20Pipeline" alt="CI/CD Pipeline"/></a>
     <a href="https://actions-badge.atrox.dev/ddc/pycaffeine/goto?ref=main"><img src="https://img.shields.io/endpoint.svg?url=https%3A//actions-badge.atrox.dev/ddc/pycaffeine/badge?ref=main&label=build&logo=github&style=plastic" alt="Build Status"/></a>
 </p>
