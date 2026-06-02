@@ -1,0 +1,18 @@
+## Changes Made
+<!-- List the key changes -->
+
+## Type of Change
+- [ ] New feature
+- [ ] Bug fix
+- [ ] Breaking change (existing functionality affected)
+- [ ] Refactoring/Optimization (no functional changes)
+- [ ] CI/CD or build configuration
+- [ ] Dependency updates
+- [ ] Documentation
+- [ ] Other
+
+## Testing
+- [ ] Manual testing performed
+
+## Reviewer
+- [ ] I understand that by approving this PR, I share responsibility for these changes
