@@ -35,6 +35,9 @@ dependencies = [
   "PyQt6>=6.11.0",
 ]
 
+[project.gui-scripts]
+pycaffeine = "pycaffeine.__main__:main"
+
 [dependency-groups]
 dev = [
   "poethepoet>=0.46.0",
@@ -46,7 +49,11 @@ dev = [
 [tool.poe.tasks]
 linter.shell = "uv run ruff check --fix . && uv run ruff format ."
 updatedev.sequence = ["linter", {shell = "uv lock --upgrade && uv sync --all-extras --all-groups"}]
-test.sequence = [{ shell = "uv run coverage run -m pytest" }, { shell = "uv run coverage report" }, { shell = "uv run coverage xml" }]
+test.sequence = [
+  { shell = "uv run coverage run -m pytest" },
+  { shell = "uv run coverage report" },
+  { shell = "uv run coverage xml" }
+]
 build.sequence = ["updatedev", "test", {shell = "uv run python scripts/pyinstaller_build.py"}]
 
 [tool.pytest.ini_options]

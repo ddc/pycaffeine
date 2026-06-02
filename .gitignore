@@ -31,6 +31,8 @@ MANIFEST
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+# ...but our spec file is hand-written and must be tracked
+!spec/*.spec
 
 # Installer logs
 pip-log.txt
@@ -161,3 +163,4 @@ cython_debug/
 # Custom
 *.prof
 junit.xml
+/docs/
