@@ -119,6 +119,21 @@ class TestCaffeineWorker:
         worker.stopped_signal.emit.assert_called_once()
         assert worker._running is False
 
+    @patch.dict("sys.modules", {"pyautogui": MagicMock()})
+    def test_run_blocks_mouseinfo_import(self):
+        """mouseinfo calls sys.exit() at import time when tkinter is broken —
+        run() must block it so pyautogui can never raise SystemExit."""
+        CaffeineWorker, _, _, _ = _import_main()
+        worker = CaffeineWorker(1)
+        worker.started_signal = MagicMock()
+        worker.stopped_signal = MagicMock()
+        sys.modules["pyautogui"].move.side_effect = lambda *a: worker.stop()
+
+        with patch.dict("sys.modules"):
+            sys.modules.pop("mouseinfo", None)
+            worker.run()
+            assert sys.modules["mouseinfo"] is None
+
 
 class TestCaffeineTray:
     def test_init_sets_default_interval(self):

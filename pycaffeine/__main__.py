@@ -25,9 +25,13 @@ class CaffeineWorker(QThread):
         self.interval = interval
 
     def run(self) -> None:
+        # mouseinfo (an optional pyautogui helper, unused here) calls sys.exit() at
+        # import time when tkinter is broken. Block it so pyautogui catches the
+        # ImportError and degrades gracefully — mouse movement only needs Xlib.
+        sys.modules.setdefault("mouseinfo", None)
         try:
             import pyautogui
-        except (Exception, SystemExit) as exc:  # mouseinfo calls sys.exit() if tkinter is broken
+        except Exception as exc:
             print(f"Caffeine: cannot import pyautogui, mouse movement disabled: {exc!r}", file=sys.stderr)
             self.stopped_signal.emit()
             return
