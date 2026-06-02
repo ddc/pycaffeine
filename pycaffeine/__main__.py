@@ -2,6 +2,7 @@ import sys
 import time
 from pathlib import Path
 from pycaffeine.constants import DEFAULT_SLEEP_INTERVAL, MOVE_PIXELS, SLEEP_INTERVAL_CHOICES, STATE_META
+from pycaffeine.inhibitor import create_inhibitor
 from PyQt6.QtCore import QThread, pyqtSignal
 from PyQt6.QtGui import QAction, QActionGroup, QIcon
 from PyQt6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
@@ -62,6 +63,7 @@ class CaffeineTray(QSystemTrayIcon):
     def __init__(self) -> None:
         super().__init__()
         self._worker: CaffeineWorker | None = None
+        self._inhibitor = create_inhibitor()
         self._interval = DEFAULT_SLEEP_INTERVAL
         self._build_menu()
         self._apply_state("stopped")
@@ -96,6 +98,20 @@ class CaffeineTray(QSystemTrayIcon):
         menu.addAction("Quit").triggered.connect(self._quit)
         self.setContextMenu(menu)
 
+    def _mechanisms_label(self) -> str:
+        """Human-readable list of the keep-awake mechanisms currently active."""
+        parts = []
+        if self._inhibitor.active:
+            parts.append("sleep-inhibit")
+        if self._worker is not None and self._worker.isRunning():
+            parts.append("mouse")
+        return " + ".join(parts) if parts else "none"
+
+    def _on_worker_stopped(self) -> None:
+        """Worker stopped: stay active if sleep inhibition still holds (worker died on
+        its own, e.g. pyautogui broken); user-initiated Stop releases the inhibitor first."""
+        self._apply_state("active" if self._inhibitor.active else "stopped")
+
     def _set_interval(self, seconds: int) -> None:
         self._interval = seconds
         if self._worker and self._worker.isRunning():
@@ -104,28 +120,35 @@ class CaffeineTray(QSystemTrayIcon):
 
     def _apply_state(self, state: str) -> None:
         meta = STATE_META[state]
-        self._status_action.setText(f"{meta['label']} ({self._interval}s)")
+        label = meta["label"]
+        if state == "active":
+            label = f"{label}: {self._mechanisms_label()}"
+        self._status_action.setText(f"{label} ({self._interval}s)")
         self.setIcon(make_tray_icon(state))
-        self.setToolTip(f"Caffeine: {meta['label']} ({self._interval}s)")
+        self.setToolTip(f"Caffeine: {label} ({self._interval}s)")
         active = state == "active"
         self._start_action.setEnabled(not active)
         self._stop_action.setEnabled(active)
 
     def _start(self) -> None:
+        self._inhibitor.acquire()
         self._worker = CaffeineWorker(self._interval)
         self._worker.started_signal.connect(lambda: self._apply_state("active"))
         self._worker.started_signal.connect(
             lambda: self.showMessage(
                 "Caffeine",
-                f"Moving mouse every {self._interval}s",
+                f"Keeping system awake every {self._interval}s",
                 QSystemTrayIcon.MessageIcon.Information,
                 3000,
             )
         )
-        self._worker.stopped_signal.connect(lambda: self._apply_state("stopped"))
+        self._worker.stopped_signal.connect(self._on_worker_stopped)
         self._worker.start()
+        if self._inhibitor.active:
+            self._apply_state("active")
 
     def _stop(self) -> None:
+        self._inhibitor.release()
         if self._worker:
             self._worker.stop()
             self._worker.wait(3000)

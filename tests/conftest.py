@@ -45,6 +45,7 @@ def mock_qt(monkeypatch):
     monkeypatch.setitem(sys.modules, "PyQt6.QtCore", _mock_qt_core)
     monkeypatch.setitem(sys.modules, "PyQt6.QtGui", _mock_qt_gui)
     monkeypatch.setitem(sys.modules, "PyQt6.QtWidgets", _mock_qt_widgets)
+    monkeypatch.setitem(sys.modules, "PyQt6.QtDBus", MagicMock())
     if "pycaffeine.__main__" in sys.modules:
         del sys.modules["pycaffeine.__main__"]
     return _mock_qt_widgets

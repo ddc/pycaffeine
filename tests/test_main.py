@@ -212,3 +212,108 @@ class TestMain:
         assert exc_info.value.code == 0
         mock_app.setQuitOnLastWindowClosed.assert_called_with(False)
         mock_app.exec.assert_called_once()
+
+
+class TestInhibitorIntegration:
+    def _make_tray(self, CaffeineTray, acquire_succeeds=True):
+        """Build a tray whose inhibitor is a stateful MagicMock."""
+        import pycaffeine.__main__ as main_mod
+
+        inhibitor = MagicMock()
+        inhibitor.active = False
+
+        def fake_acquire():
+            inhibitor.active = acquire_succeeds
+            return acquire_succeeds
+
+        def fake_release():
+            inhibitor.active = False
+
+        inhibitor.acquire.side_effect = fake_acquire
+        inhibitor.release.side_effect = fake_release
+        with patch.object(main_mod, "create_inhibitor", return_value=inhibitor):
+            tray = CaffeineTray()
+        return tray, inhibitor
+
+    def test_init_acquires_inhibitor_via_autostart(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        inhibitor.acquire.assert_called_once()
+        assert inhibitor.active is True
+
+    def test_stop_releases_inhibitor(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        tray._stop()
+        inhibitor.release.assert_called_once()
+        assert inhibitor.active is False
+
+    def test_quit_releases_inhibitor(self, mock_qt):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        tray._worker = None
+        tray._quit()
+        inhibitor.release.assert_called_once()
+
+    def test_worker_death_keeps_active_while_inhibited(self):
+        """Worker dies on its own while the inhibitor holds -> stays active."""
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        tray._status_action = MagicMock()
+        tray._start_action = MagicMock()
+        tray._stop_action = MagicMock()
+        tray._on_worker_stopped()
+        # still active: stop stays enabled
+        tray._stop_action.setEnabled.assert_called_with(True)
+
+    def test_worker_death_goes_stopped_when_not_inhibited(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray, acquire_succeeds=False)
+        tray._status_action = MagicMock()
+        tray._start_action = MagicMock()
+        tray._stop_action = MagicMock()
+        tray._on_worker_stopped()
+        tray._stop_action.setEnabled.assert_called_with(False)
+
+    def test_mechanisms_label_inhibit_only(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        # conftest QThread mock: isRunning() is always False -> mouse not counted
+        assert tray._mechanisms_label() == "sleep-inhibit"
+
+    def test_mechanisms_label_both(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+        running_worker = MagicMock()
+        running_worker.isRunning.return_value = True
+        tray._worker = running_worker
+        assert tray._mechanisms_label() == "sleep-inhibit + mouse"
+
+    def test_mechanisms_label_mouse_only(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray, acquire_succeeds=False)
+        running_worker = MagicMock()
+        running_worker.isRunning.return_value = True
+        tray._worker = running_worker
+        assert tray._mechanisms_label() == "mouse"
+
+    def test_mechanisms_label_none(self):
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray, acquire_succeeds=False)
+        assert tray._mechanisms_label() == "none"
+
+    def test_stop_releases_inhibitor_before_stopping_worker(self):
+        """The release-before-stop ordering lets _on_worker_stopped distinguish
+        user-initiated stops from the worker dying on its own."""
+        _, CaffeineTray, _, _ = _import_main()
+        tray, inhibitor = self._make_tray(CaffeineTray)
+
+        call_order = []
+        inhibitor.release.side_effect = lambda: call_order.append("release")
+        mock_worker = MagicMock()
+        mock_worker.stop.side_effect = lambda: call_order.append("worker_stop")
+        tray._worker = mock_worker
+
+        tray._stop()
+
+        assert call_order == ["release", "worker_stop"]
