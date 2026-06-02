@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/ddc/pycaffeine/refs/heads/master/assets/pycaffeine-icon.svg" alt="pycaffeine" width="150">
+  <img src="https://raw.githubusercontent.com/ddc/pycaffeine/refs/heads/main/assets/pycaffeine-icon.svg" alt="pycaffeine" width="150">
   <br>
   pycaffeine
 </h1>
@@ -23,7 +23,7 @@
     <a href="https://sonarcloud.io/component_measures?id=ddc_caffeine&metric=coverage"><img src="https://img.shields.io/sonar/coverage/ddc_caffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="SonarCloud Coverage"/></a>
     <a href="https://sonarcloud.io/dashboard?id=ddc_caffeine"><img src="https://img.shields.io/sonar/quality_gate/ddc_caffeine?server=https%3A%2F%2Fsonarcloud.io&style=plastic&logo=sonarqubecloud&logoColor=white" alt="Quality Gate Status"/></a>
     <a href="https://github.com/ddc/pycaffeine/actions/workflows/workflow.yml"><img src="https://img.shields.io/github/actions/workflow/status/ddc/pycaffeine/workflow.yml?style=plastic&logo=github&logoColor=white&label=CI%2FCD%20Pipeline" alt="CI/CD Pipeline"/></a>
-    <a href="https://actions-badge.atrox.dev/ddc/pycaffeine/goto?ref=master"><img src="https://img.shields.io/endpoint.svg?url=https%3A//actions-badge.atrox.dev/ddc/pycaffeine/badge?ref=master&label=build&logo=github&style=plastic" alt="Build Status"/></a>
+    <a href="https://actions-badge.atrox.dev/ddc/pycaffeine/goto?ref=main"><img src="https://img.shields.io/endpoint.svg?url=https%3A//actions-badge.atrox.dev/ddc/pycaffeine/badge?ref=main&label=build&logo=github&style=plastic" alt="Build Status"/></a>
 </p>
 
 <p align="center">Keep computer awake by moving the cursor by 1 pixel back and forth every few seconds</p>
